@@ -54,7 +54,8 @@
 		},
 		{
 			"ImportPath": "github.com/codegangsta/cli",
-			"Rev": "aca5b047ed14d17224157c3434ea93bf6cdaadee"
+			"Comment": "v1.17.0-16-g7f0ca9a",
+			"Rev": "7f0ca9a34958d6702ac8f38530d19001fa5b1560"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/negroni",

@@ -245,6 +245,20 @@ func main() {
 	app.Flags = append(app.Flags, tribe.Flags...)
 
 	app.Action = action
+	cli.AppHelpTemplate = `NAME:
+   {{.Name}} - {{.Usage}}
+USAGE:
+   {{.Name}} {{if .VisibleFlags}}[options]{{end}}{{if .VisibleFlags}}
+OPTIONS:
+   {{range .VisibleFlags}}{{.}}
+   {{end}}{{end}}{{if .Copyright }}
+COPYRIGHT:
+   {{.Copyright}}
+   {{end}}{{if .Version}}
+VERSION:
+   {{.Version}}
+   {{end}}
+`
 	app.Run(os.Args)
 }
 
