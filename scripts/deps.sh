@@ -1,9 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash
 
 #http://www.apache.org/licenses/LICENSE-2.0.txt
 #
 #
-#Copyright 2015 Intel Corporation
+#Copyright 2016 Intel Corporation
 #
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
@@ -17,18 +17,56 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
-# This script runs the correct godep sequences for snap and built-in plugins
-# This will rebase back to the committed version. It should be run from snap/.
-ctrl_c()
-{
-  exit $?
+set -e
+set -u
+set -o pipefail
+
+__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+__proj_dir="$(dirname "$__dir")"
+
+# shellcheck source=scripts/common.sh
+. "${__dir}/common.sh"
+
+detect_go_dep() {
+  [[ -f "${__proj_dir}/Godeps/Godeps.json" ]] && _dep='godep'
+  [[ -f "${__proj_dir}/glide.yaml" ]] && _dep='glide'
+  [[ -f "${__proj_dir}/vendor/vendor.json" ]] && _dep='govendor'
+  _info "golang dependency tool: ${_dep}"
+  echo "${_dep}"
 }
-trap ctrl_c SIGINT
 
-# Godep
-echo "Getting godep if not found"
-go get github.com/tools/godep
+install_go_dep() {
+  local _dep=${_dep:=$(_detect_dep)}
+  _info "ensuring ${_dep} is available"
+  case $_dep in
+    godep)
+      _go_get github.com/tools/godep
+      ;;
+    glide)
+      _go_get github.com/Masterminds/glide
+      ;;
+    govendor)
+      _go_get github.com/kardianos/govendor
+      ;;
+  esac
+}
 
-# First load snap deps
-echo "Checking snap root for deps"
-godep restore
+restore_go_dep() {
+  local _dep=${_dep:=$(_detect_dep)}
+  _info "restoring dependency with ${_dep}"
+  case $_dep in
+    godep)
+      (cd "${__proj_dir}" && godep restore)
+      ;;
+    glide)
+      (cd "${__proj_dir}" && glide install)
+      ;;
+    govendor)
+      (cd "${__proj_dir}" && govendor sync)
+      ;;
+  esac
+}
+
+_dep=$(detect_go_dep)
+install_go_dep
+restore_go_dep
