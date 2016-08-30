@@ -3,17 +3,30 @@ require "serverspec"
 require "docker"
 require "pry"
 
+RSpec.configure do |config|
+  config.docker_container_create_options = {
+    'HostConfig': {
+      "PortBindings": {
+        "8083/tcp": [{ 'HostPort' => '8083' }],
+        "8086/tcp": [{ 'HostPort' => '8086' }],
+      },
+    }
+  }
+end
 describe "Dockerfile" do
 
   before(:all) do
     influxdb_path = File.join Pathname.new(__FILE__).parent.parent, "influxdb/0.12/"
-    image = Docker::Image.build_from_dir influxdb_path
+
+    image = Docker::Image.get "7bb212dd9198"
     set :backend, :docker
     set :docker_image, image.id
   end
 
   describe port(8083) do
-    it {should be_listening }
+    it {
+      should be_listening
+    }
   end
 
   # TODO: These wont' work
