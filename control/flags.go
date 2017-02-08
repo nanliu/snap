@@ -70,5 +70,11 @@ var (
 		EnvVar: "SNAP_CONTROL_LISTEN_ADDR",
 	}
 
-	Flags = []cli.Flag{flNumberOfPLs, flPluginLoadTimeout, flAutoDiscover, flPluginTrust, flKeyringPaths, flCache, flControlRpcPort, flControlRpcAddr}
+	flTempDirPath = cli.StringFlag{
+		Name:   "temp_dir_path",
+		Usage:  "Listen address for control RPC server",
+		EnvVar: "TEMP_DIR_PATH",
+	}
+
+	Flags = []cli.Flag{flNumberOfPLs, flPluginLoadTimeout, flAutoDiscover, flPluginTrust, flKeyringPaths, flCache, flControlRpcPort, flControlRpcAddr, flTempDirPath}
 )
